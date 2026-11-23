@@ -1,0 +1,107 @@
+# CodeScene Code Health Plugin for Claude Code
+
+A Claude Code plugin that provides CodeScene Code Health analysis tools and skills for reviewing, refactoring, and safeguarding code quality.
+
+## Installation
+
+### From a marketplace
+
+If this plugin is listed in a marketplace, install it with:
+
+```
+/plugin install codescene
+```
+
+### Local testing
+
+```bash
+claude --plugin-dir ./claude-code-plugin
+```
+
+## Authentication
+
+**Recommended (interactive):** Sign in with OAuth — no token paste required:
+
+- Invoke the `login` MCP prompt (slash command) if your client exposes MCP prompts
+- Or ask Claude: *Log me in to CodeScene* (calls the `login` tool and opens your browser)
+
+To sign out, use the `logout` prompt/tool, or ask Claude to log you out.
+
+**Multi-account Cloud:** If you belong to multiple CodeScene Cloud accounts, switch with:
+
+> Switch my CodeScene account to CodeScene OSS
+
+> Switch my CodeScene account to 123 
+
+That calls `switch_account` (do not rely on `set_config(account_id=…)` alone while signed in).
+
+**On-prem:** Set your instance URL first, then log in:
+
+> Set my CodeScene on-prem URL to https://codescene.mycompany.com
+
+> Log me in to CodeScene
+
+**CI / headless:** Use a Personal Access Token via `set_config` or `CS_ACCESS_TOKEN`. A saved PAT **blocks** OAuth until cleared.
+
+See [Authentication](https://github.com/codescene-oss/codehealth-mcp/blob/main/docs/authentication.md) for details.
+
+## Skills
+
+Once installed, the following skills are available:
+
+<!-- SKILLS-TABLE:START -->
+| Skill | Description |
+|-------|-------------|
+| `/codescene:configuring-codehealth-mcp` | Use when the user wants to view, set, or troubleshoot CodeHealth MCP configuration such as OAuth login, access tokens, account IDs, on-prem URLs, default projects, or SSL certificates. |
+| `/codescene:explaining-code-health` | Use when a user asks what Code Health means, how to interpret scores, or why Code Health matters in daily development. |
+| `/codescene:guiding-refactoring-with-code-health` | Use when refactoring unhealthy code and needing Code Health findings to choose small safe steps and verify improvement. |
+| `/codescene:installing-and-activating-codehealth-mcp` | Use when installing the CodeHealth MCP Server binary or package, registering it in an AI assistant, or copying agent guidance files into a repository. |
+| `/codescene:making-the-business-case-for-code-health` | Use when a user asks for ROI, stakeholder justification, delivery impact, or defect-risk reduction from improving Code Health in a file. |
+| `/codescene:prioritizing-technical-debt` | Use when users with a CodeScene instance ask what to improve first across a project, which hotspots matter most, or how to rank refactoring candidates. |
+| `/codescene:risk-based-testing-with-code-health` | Use when a user asks what to test first based on CodeScene findings, especially for high-risk hotspots or pull-request change sets. |
+| `/codescene:routing-work-with-code-ownership` | Use when choosing reviewers, domain experts, or likely owners for a file or directory from CodeScene project data. |
+| `/codescene:safeguarding-ai-generated-code` | Use when AI-generated or AI-modified changes need a Code Health gate before commit, handoff, or pull request. |
+<!-- SKILLS-TABLE:END -->
+
+## MCP Tools
+
+The plugin registers the CodeHealth MCP server, which provides the following tools:
+
+### Authentication & configuration (all users)
+
+| Tool | Description |
+|------|-------------|
+| `login` | Sign in to CodeScene with OAuth (opens browser) |
+| `logout` | Sign out of CodeScene OAuth and clear the stored session |
+| `get_config` | Read current MCP server configuration |
+| `set_config` | Write MCP server configuration values |
+
+### Standalone mode (standalone MCP license)
+
+| Tool | Description |
+|------|-------------|
+| `code_health_review` | Review a file's Code Health with score and code smell findings |
+| `code_health_score` | Calculate the numeric Code Health score (1.0–10.0) for a file |
+| `pre_commit_code_health_safeguard` | Check all modified/staged files for Code Health regressions before commit |
+| `analyze_change_set` | Branch-level Code Health review for PR pre-flight checks |
+| `code_health_refactoring_business_case` | Generate a data-driven business case for refactoring a file |
+| `explain_code_health` | Explain the Code Health metric and how to interpret scores |
+| `explain_code_health_productivity` | Describe the productivity and defect-risk impact of Code Health |
+
+### CodeScene Cloud or On-prem mode (OAuth or PAT)
+
+Includes all standalone tools, plus project-level API tools:
+
+| Tool | Description |
+|------|-------------|
+| `select_project` | List and select a CodeScene project |
+| `list_technical_debt_hotspots_for_project` | List technical debt hotspots across a project |
+| `list_technical_debt_hotspots_for_project_file` | List hotspot metrics for a specific file |
+| `list_technical_debt_goals_for_project` | List technical debt goals for a project |
+| `list_technical_debt_goals_for_project_file` | List technical debt goals for a specific file |
+| `code_ownership_for_path` | Find owners of a file or directory |
+
+## Requirements
+
+- Node.js (for `npx` to run the MCP server)
+- The MCP server binary is downloaded automatically on first run via the `@codescene/codehealth-mcp` npm package
